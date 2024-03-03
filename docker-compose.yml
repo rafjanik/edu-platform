@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  backend:
+    build:
+      dockerfile: .docker/backend/Dockerfile
+      context: .
+    container_name: "${APP_NAME}-backend"
+    command: npm run start:dev
+    restart: "always"
+    ports:
+      - "3000:3000"
+    links:
+      - postgres
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+  postgres:
+    image: postgres:16.2
+    container_name: "${APP_NAME}-postgres"
+    restart: "always"
+    ports:
+      - "5432:5432"
+    volumes:
+      - .docker/postgres/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}

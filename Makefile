@@ -1,5 +1,17 @@
+up:
+	docker-compose up -d
+
+down:
+	docker-compose down
+
+logs:
+	docker-compose logs
+
+build:
+	docker-compose build --no-cache
+
 shell:
-	docker run -it --rm -v ./:/app -w /app node bash
+	docker exec -it edu-platforma-backend bash 
 
 version:
 	docker --version
