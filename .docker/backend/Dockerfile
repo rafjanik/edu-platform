@@ -10,6 +10,8 @@ COPY ./backend/package*.json .
 
 RUN npm install
 
+USER node
+
 CMD [ "node", "/app/dist/main" ]
 
 EXPOSE 3000
