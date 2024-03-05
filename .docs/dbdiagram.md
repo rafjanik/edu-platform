@@ -5,57 +5,69 @@
 ```
 
 Table courses {
-    id integer [primary key]
-    instructor_id integer
-    title varchar
-    slug varchar
-    thumbnail varchar
-    description text
-    created_at timestamp
-    updated_at timestamp
+  id integer [primary key]
+  instructor_id integer
+  title varchar
+  slug varchar [unique]
+  thumbnail varchar
+  description text
+  position int [unique]
+  created_at timestamp
+  updated_at timestamp
 }
 
 Table sections {
-    id integer [primary key]
-    course_id integer
-    title varchar
-    slug varchar
-    position int [unique]
-    created_at timestamp
-    updated_at timestamp
+  id integer [primary key]
+  course_id integer
+  title varchar
+  slug varchar [unique]
+  position int [unique]
+  created_at timestamp
+  updated_at timestamp
 }
 
 Table lessons {
-    id integer [primary key]
-    section_id integer
-    title varchar
-    slug varchar
-    video_url varchar
-    video_length int
-    description text
-    position int [unique]
-    created_at timestamp
-    updated_at timestamp
+  id integer [primary key]
+  section_id integer
+  title varchar
+  slug varchar [unique]
+  video_url varchar
+  video_length int
+  description text
+  position int [unique]
+  created_at timestamp
+  updated_at timestamp
 }
 
 Enum user_role {
-    admin
-    instructor
-    user
+  admin
+  instructor
+  user
 }
 
 Table users {
-    id integer [primary key]
-    nick varchar [unique]
-    email varchar
-    password varchar
-    role user_role
-    created_at timestamp
-    updated_at timestamp
+  id integer [primary key]
+  nick varchar [unique]
+  email varchar  [unique]
+  password varchar
+  role user_role
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table user_courses {
+  id integer [primary key]
+  user_id integer
+  course_id integer
+  assign_to date
+  created_at timestamp
+  updated_at timestamp
 }
 
 Ref: users.id < courses.instructor_id
 Ref: courses.id < sections.course_id
 Ref: sections.id < lessons.section_id
+Ref: courses.id < user_courses.course_id
+Ref: users.id < user_courses.user_id
 
 ```
