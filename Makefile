@@ -13,5 +13,9 @@ build:
 shell:
 	docker exec -it edu-platforma-backend bash 
 
+shell-root:
+	docker exec -it -u root edu-platforma-backend bash 
+
+
 version:
 	docker --version
