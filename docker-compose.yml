@@ -14,6 +14,7 @@ services:
       - postgres
     volumes:
       - ./backend:/app
+      - ./.env:/app/.env
       - /app/node_modules
   postgres:
     image: postgres:16.2
