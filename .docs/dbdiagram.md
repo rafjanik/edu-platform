@@ -6,7 +6,7 @@
 
 Table courses {
   id integer [primary key]
-  instructor_id integer
+  user_id integer
   title varchar
   slug varchar [unique]
   thumbnail varchar
@@ -64,7 +64,7 @@ Table user_courses {
   updated_at timestamp
 }
 
-Ref: users.id < courses.instructor_id
+Ref: users.id < courses.user_id
 Ref: courses.id < sections.course_id
 Ref: sections.id < lessons.section_id
 Ref: courses.id < user_courses.course_id
