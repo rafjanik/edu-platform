@@ -1,4 +1,11 @@
-import { Column, Entity, Generated, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  Generated,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { kebabCase } from 'lodash';
 
 @Entity({ name: 'courses' })
 export class Course {
@@ -29,4 +36,9 @@ export class Course {
 
   @Column({ default: new Date() })
   updated_at: Date;
+
+  @BeforeInsert()
+  private beforeInsert(): void {
+    this.slug = kebabCase(this.title);
+  }
 }

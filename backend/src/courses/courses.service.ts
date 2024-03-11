@@ -27,12 +27,18 @@ export class CoursesService {
       created_at: new Date(),
       updated_at: new Date(),
     };
+
     return this.courseRepository.save(course);
   }
 
   update(id: number, updateCourseDto: UpdateCourseDto) {
-    // const course = this.courseRepository.findOneBy({ id });
-    // return this.courseRepository.save(course);
+    const course = {
+      id: id,
+      ...updateCourseDto,
+      updated_at: new Date(),
+    };
+
+    return this.courseRepository.save(course);
   }
 
   async delete(id: number): Promise<DeleteResult> {
