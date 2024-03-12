@@ -4,6 +4,7 @@ import {
   Entity,
   Generated,
   PrimaryGeneratedColumn,
+  VersionColumn,
 } from 'typeorm';
 import { kebabCase } from 'lodash';
 
@@ -36,6 +37,9 @@ export class Course {
 
   @Column({ default: new Date() })
   updated_at: Date;
+
+  @VersionColumn()
+  version!: number;
 
   @BeforeInsert()
   private beforeInsert(): void {
