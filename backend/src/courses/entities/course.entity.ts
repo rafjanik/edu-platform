@@ -1,5 +1,6 @@
 import {
   BeforeInsert,
+  BeforeUpdate,
   Column,
   Entity,
   Generated,
@@ -42,7 +43,7 @@ export class Course {
   version!: number;
 
   @BeforeInsert()
-  private beforeInsert(): void {
-    this.slug = kebabCase(this.title);
+  async generateSlug() {
+    this.slug = await kebabCase(this.title);
   }
 }

@@ -20,13 +20,13 @@ export class CoursesService {
   }
 
   create(createCourseDto: CreateCourseDto) {
-    const course = {
+    const attributes = {
       ...createCourseDto,
       user_id: 1, // TODO: id auth user
-      slug: createCourseDto.title.toLowerCase(),
       created_at: new Date(),
       updated_at: new Date(),
     };
+    const course = Object.assign(new Course(), attributes);
 
     return this.courseRepository.save(course);
   }
