@@ -15,6 +15,7 @@ import { CoursesModule } from './courses/courses.module';
       database: process.env.POSTGRES_DB,
       autoLoadEntities: true,
       synchronize: true,
+      logging: true,
     }),
     CoursesModule,
   ],
