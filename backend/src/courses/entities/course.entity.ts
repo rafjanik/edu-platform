@@ -1,13 +1,10 @@
 import {
-  BeforeInsert,
-  BeforeUpdate,
   Column,
   Entity,
   Generated,
   PrimaryGeneratedColumn,
   VersionColumn,
 } from 'typeorm';
-import { kebabCase } from 'lodash';
 
 @Entity({ name: 'courses' })
 export class Course {
@@ -17,7 +14,7 @@ export class Course {
   @Column()
   user_id: number;
 
-  @Column()
+  @Column({ length: 128 })
   title: string;
 
   @Column({ unique: true })
@@ -26,7 +23,7 @@ export class Course {
   @Column({ nullable: true })
   thumbnail: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   description: string;
 
   @Column({ unique: true })
@@ -41,9 +38,4 @@ export class Course {
 
   @VersionColumn()
   version!: number;
-
-  @BeforeInsert()
-  async generateSlug() {
-    this.slug = await kebabCase(this.title);
-  }
 }

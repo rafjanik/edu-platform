@@ -4,12 +4,12 @@ import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { DeleteResult, Repository } from 'typeorm';
 import { Course } from './entities/course.entity';
+import { kebabCase } from 'lodash';
+import { CourseRepository } from './courses.repository';
 
 @Injectable()
 export class CoursesService {
-  constructor(
-    @InjectRepository(Course) private courseRepository: Repository<Course>,
-  ) {}
+  constructor(private courseRepository: CourseRepository) {}
 
   findAll() {
     return this.courseRepository.find();
@@ -19,10 +19,11 @@ export class CoursesService {
     return this.courseRepository.findOneBy({ id });
   }
 
-  create(createCourseDto: CreateCourseDto) {
+  async create(createCourseDto: CreateCourseDto) {
     const attributes = {
       ...createCourseDto,
       user_id: 1, // TODO: id auth user
+      slug: await this.generateSlug(createCourseDto.title),
       created_at: new Date(),
       updated_at: new Date(),
     };
@@ -43,5 +44,17 @@ export class CoursesService {
 
   async delete(id: number): Promise<DeleteResult> {
     return await this.courseRepository.delete(id);
+  }
+
+  async generateSlug(title: string) {
+    const baseSlug = kebabCase(title);
+    let customSlug = baseSlug;
+    let slugCount = 1;
+
+    while (await this.courseRepository.existingSlug(customSlug)) {
+      customSlug = `${baseSlug}-${slugCount++}`;
+    }
+
+    return customSlug;
   }
 }
