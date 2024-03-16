@@ -20,7 +20,7 @@ export class Course {
   @Column({ unique: true })
   slug: string;
 
-  @Column({ nullable: true })
+  @Column({ default: null, nullable: true })
   thumbnail: string;
 
   @Column({ type: 'text', nullable: true })
