@@ -7,16 +7,25 @@ import {
   Delete,
   HttpCode,
   Put,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course } from './entities/course.entity';
-import { UpdateResult } from 'typeorm';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { StoreProvider } from './StoreProvider';
+import { diskStorage } from 'multer';
+import { v4 as uuid } from 'uuid';
+import * as mime from 'mime';
 
 @Controller('courses')
 export class CoursesController {
-  constructor(private readonly coursesService: CoursesService) {}
+  constructor(
+    private readonly coursesService: CoursesService,
+    private readonly storeProvider: StoreProvider,
+  ) {}
 
   @Get()
   findAll() {
@@ -29,7 +38,17 @@ export class CoursesController {
   }
 
   @Post()
-  create(@Body() createCourseDto: CreateCourseDto) {
+  @UseInterceptors(
+    FileInterceptor('thumbnail', {
+      storage: diskStorage({
+        destination: '../../storage', // this.storeProvider.storageLocation(),
+        filename: (req, file, cb) =>
+          cb(null, `${uuid()}.${(mime as any).extensions[file.mimetype]}`),
+      }),
+    }),
+  )
+  create(@Body() createCourseDto: CreateCourseDto, @UploadedFile() file) {
+    console.log(file);
     return this.coursesService.create(createCourseDto);
   }
 
