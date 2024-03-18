@@ -15,7 +15,7 @@ import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course } from './entities/course.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { StoreProvider } from './StoreProvider';
+import { StoreProvider } from './store.provider';
 import { diskStorage } from 'multer';
 import { v4 as uuid } from 'uuid';
 import * as mime from 'mime';
@@ -24,7 +24,7 @@ import * as mime from 'mime';
 export class CoursesController {
   constructor(
     private readonly coursesService: CoursesService,
-    private readonly storeProvider: StoreProvider,
+    public readonly storeProvider: StoreProvider,
   ) {}
 
   @Get()
@@ -41,14 +41,18 @@ export class CoursesController {
   @UseInterceptors(
     FileInterceptor('thumbnail', {
       storage: diskStorage({
-        destination: '../../storage', // this.storeProvider.storageLocation(),
+        destination: this.storeProvider?.storageLocation(),
         filename: (req, file, cb) =>
           cb(null, `${uuid()}.${(mime as any).extensions[file.mimetype]}`),
       }),
     }),
   )
-  create(@Body() createCourseDto: CreateCourseDto, @UploadedFile() file) {
-    console.log(file);
+  create(@Body() createCourseDto: CreateCourseDto, @UploadedFile() thumbnail) {
+    console.log(thumbnail);
+
+    if (thumbnail) {
+      createCourseDto.thumbnail = thumbnail.filename;
+    }
     return this.coursesService.create(createCourseDto);
   }
 
