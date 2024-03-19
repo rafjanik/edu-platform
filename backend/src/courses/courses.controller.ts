@@ -15,17 +15,14 @@ import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course } from './entities/course.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { StoreProvider } from './store.provider';
 import { diskStorage } from 'multer';
 import { v4 as uuid } from 'uuid';
 import * as mime from 'mime';
+import { uploadFileName, storageLocation } from './storage';
 
 @Controller('courses')
 export class CoursesController {
-  constructor(
-    private readonly coursesService: CoursesService,
-    public readonly storeProvider: StoreProvider,
-  ) {}
+  constructor(private readonly coursesService: CoursesService) {}
 
   @Get()
   findAll() {
@@ -41,9 +38,8 @@ export class CoursesController {
   @UseInterceptors(
     FileInterceptor('thumbnail', {
       storage: diskStorage({
-        destination: this.storeProvider?.storageLocation(),
-        filename: (req, file, cb) =>
-          cb(null, `${uuid()}.${(mime as any).extensions[file.mimetype]}`),
+        destination: storageLocation(),
+        filename: (req, file, cb) => cb(null, uploadFileName(file)),
       }),
     }),
   )
