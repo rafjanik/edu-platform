@@ -9,6 +9,7 @@ import {
   Put,
   UseInterceptors,
   UploadedFile,
+  UsePipes,
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
@@ -16,9 +17,8 @@ import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course } from './entities/course.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { v4 as uuid } from 'uuid';
-import * as mime from 'mime';
 import { uploadFileName, storageLocation } from './storage';
+import { ThumbnailValidationPipe } from './validations/thumbnail-validation.pipe';
 
 @Controller('courses')
 export class CoursesController {
@@ -43,9 +43,11 @@ export class CoursesController {
       }),
     }),
   )
-  create(@Body() createCourseDto: CreateCourseDto, @UploadedFile() thumbnail) {
-    console.log(thumbnail);
-
+  @UsePipes(ThumbnailValidationPipe)
+  create(
+    @UploadedFile() thumbnail: Express.Multer.File,
+    @Body() createCourseDto: CreateCourseDto,
+  ) {
     if (thumbnail) {
       createCourseDto.thumbnail = thumbnail.filename;
     }
@@ -60,7 +62,6 @@ export class CoursesController {
   @Delete(':id')
   @HttpCode(204)
   remove(@Param('id') id: string) {
-    console.log(id);
     return this.coursesService.delete(parseInt(id));
   }
 }
