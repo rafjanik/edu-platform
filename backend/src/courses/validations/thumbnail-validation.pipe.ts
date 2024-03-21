@@ -10,7 +10,7 @@ export class ThumbnailValidationPipe implements PipeTransform {
   readonly maxFileSize: number = 5 * 1024 * 1024;
 
   transform(value: Express.Multer.File, metadata: ArgumentMetadata) {
-    if (metadata.type == 'body') {
+    if (metadata.type === 'body' || metadata.type === 'param') {
       return value;
     }
 

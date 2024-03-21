@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { DeleteResult } from 'typeorm';
@@ -10,12 +10,17 @@ import { CourseRepository } from './courses.repository';
 export class CoursesService {
   constructor(private courseRepository: CourseRepository) {}
 
-  findAll() {
-    return this.courseRepository.find();
+  async findAll() {
+    return await this.courseRepository.find();
   }
 
-  findOne(id: number): Promise<Course | null> {
-    return this.courseRepository.findOneBy({ id });
+  async findOne(id: number): Promise<Course | null> {
+    const course = await this.courseRepository.findOneBy({ id });
+    if (!course) {
+      throw new NotFoundException('Course not found');
+    }
+
+    return course;
   }
 
   async create(createCourseDto: CreateCourseDto) {
@@ -31,17 +36,27 @@ export class CoursesService {
     return this.courseRepository.save(course);
   }
 
-  update(id: number, updateCourseDto: UpdateCourseDto) {
-    const course = {
+  async update(id: number, updateCourseDto: UpdateCourseDto) {
+    const course = await this.courseRepository.findOneBy({ id });
+    if (!course) {
+      throw new NotFoundException('Course not found');
+    }
+
+    const attributes = {
       id: id,
       ...updateCourseDto,
       updated_at: new Date(),
     };
 
-    return this.courseRepository.save(course);
+    return this.courseRepository.save(attributes);
   }
 
   async delete(id: number): Promise<DeleteResult> {
+    const course = await this.courseRepository.findOneBy({ id });
+    if (!course) {
+      throw new NotFoundException('Course not found');
+    }
+
     return await this.courseRepository.delete(id);
   }
 

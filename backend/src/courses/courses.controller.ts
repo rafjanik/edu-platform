@@ -51,11 +51,29 @@ export class CoursesController {
     if (thumbnail) {
       createCourseDto.thumbnail = thumbnail.filename;
     }
+
     return this.coursesService.create(createCourseDto);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
+  @UseInterceptors(
+    FileInterceptor('thumbnail', {
+      storage: diskStorage({
+        destination: storageLocation(),
+        filename: (req, file, cb) => cb(null, uploadFileName(file)),
+      }),
+    }),
+  )
+  @UsePipes(ThumbnailValidationPipe)
+  update(
+    @Param('id') id: string,
+    @UploadedFile() thumbnail: Express.Multer.File,
+    @Body() updateCourseDto: UpdateCourseDto,
+  ) {
+    if (thumbnail) {
+      updateCourseDto.thumbnail = thumbnail.filename;
+    }
+
     return this.coursesService.update(parseInt(id), updateCourseDto);
   }
 
