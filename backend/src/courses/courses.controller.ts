@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Body,
   Param,
   Delete,
@@ -13,9 +14,12 @@ import {
 } from '@nestjs/common';
 import {
   ApiTags,
+  ApiBody,
   ApiOperation,
   ApiResponse,
   ApiCreatedResponse,
+  ApiOkResponse,
+  ApiConsumes,
   getSchemaPath,
 } from '@nestjs/swagger';
 import { CoursesService } from './courses.service';
@@ -26,6 +30,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { uploadFileName, storageLocation } from './storage';
 import { ThumbnailValidationPipe } from './validations/thumbnail-validation.pipe';
+import { ThumbnailFileUploadDto } from './dto/thumbnail-file-upload.dto';
 
 @ApiTags('Courses')
 @Controller('courses')
@@ -33,11 +38,11 @@ export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
   @ApiOperation({
-    summary: 'Get list courses',
+    summary: 'List all courses',
   })
   @ApiResponse({
     status: 200,
-    description: 'Get list courses',
+    description: 'List all courses',
     schema: {
       type: 'array',
       items: { $ref: getSchemaPath(Course) },
@@ -66,6 +71,7 @@ export class CoursesController {
   })
   @ApiCreatedResponse({
     description: 'Course created',
+    type: Course,
   })
   @Post()
   @UseInterceptors(
@@ -80,7 +86,7 @@ export class CoursesController {
   create(
     @UploadedFile() thumbnail: Express.Multer.File,
     @Body() createCourseDto: CreateCourseDto,
-  ) {
+  ): Promise<Course> {
     if (thumbnail) {
       createCourseDto.thumbnail = thumbnail.filename;
     }
@@ -89,6 +95,23 @@ export class CoursesController {
   }
 
   @Put(':id')
+  update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
+    return this.coursesService.update(parseInt(id), updateCourseDto);
+  }
+
+  @ApiOperation({
+    summary: 'Upload thumbnail',
+  })
+  @ApiBody({
+    description: 'Upload thumbnail',
+    type: ThumbnailFileUploadDto,
+  })
+  @ApiOkResponse({
+    description: 'Upload thumbnail',
+    type: Course,
+  })
+  @ApiConsumes('multipart/form-data')
+  @Patch(':id/thumbnail')
   @UseInterceptors(
     FileInterceptor('thumbnail', {
       storage: diskStorage({
@@ -98,16 +121,14 @@ export class CoursesController {
     }),
   )
   @UsePipes(ThumbnailValidationPipe)
-  update(
+  updateThumbnail(
     @Param('id') id: string,
     @UploadedFile() thumbnail: Express.Multer.File,
-    @Body() updateCourseDto: UpdateCourseDto,
   ) {
-    if (thumbnail) {
-      updateCourseDto.thumbnail = thumbnail.filename;
-    }
-
-    return this.coursesService.update(parseInt(id), updateCourseDto);
+    return this.coursesService.updateThumbnail(
+      parseInt(id),
+      thumbnail?.filename ?? null,
+    );
   }
 
   @ApiOperation({

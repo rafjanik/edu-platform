@@ -11,7 +11,11 @@ export class CoursesService {
   constructor(private courseRepository: CourseRepository) {}
 
   async findAll() {
-    return await this.courseRepository.find();
+    return await this.courseRepository.find({
+      order: {
+        position: 'ASC',
+      },
+    });
   }
 
   async findOne(id: number): Promise<Course | null> {
@@ -45,6 +49,21 @@ export class CoursesService {
     const attributes = {
       id: id,
       ...updateCourseDto,
+      updated_at: new Date(),
+    };
+
+    return this.courseRepository.save(attributes);
+  }
+
+  async updateThumbnail(id: number, thumbnail?: string) {
+    const course = await this.courseRepository.findOneBy({ id });
+    if (!course) {
+      throw new NotFoundException('Course not found');
+    }
+
+    const attributes = {
+      ...course,
+      thumbnail,
       updated_at: new Date(),
     };
 
