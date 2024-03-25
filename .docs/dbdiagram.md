@@ -47,7 +47,7 @@ Enum user_role {
 
 Table users {
   id integer [primary key]
-  nick varchar [unique]
+  name varchar
   email varchar  [unique]
   password varchar
   role user_role
