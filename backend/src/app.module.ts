@@ -2,6 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { CoursesModule } from './courses/courses.module';
+import { UsersModule } from './users/users.module';
+import { SectionsModule } from './sections/sections.module';
+import { LessonsModule } from './lessons/lessons.module';
 
 @Module({
   imports: [
@@ -21,6 +24,9 @@ import { CoursesModule } from './courses/courses.module';
       migrationsTableName: 'migrations',
     }),
     CoursesModule,
+    UsersModule,
+    SectionsModule,
+    LessonsModule,
   ],
   controllers: [],
   providers: [],
